@@ -1,5 +1,6 @@
 
 import numpy as np
+import time
 
 
 def generate_data(b,seq_length,num_seq):
@@ -96,7 +97,7 @@ def test(alg):
 	alphabet = 4
 
 	num_sequences = 500
-	seq_length = 20
+	seq_length = 200
 
 	#Calculate transition matrix based on motif finding problem
 	#States 1 to motif_length correspond to locations on motif
@@ -135,22 +136,32 @@ def test(alg):
 		print("Emission Probabilities:")
 		print(b)
 		print()
-
+		total_time = 0
 		for i in range(num_sequences):
 			if alg == "Viterbi":
+				t1 = time.time()
 				pred = viterbi(trans_prob,b,trans_prob[0,:],sequences[i,:])[1]
+				t2 = time.time()
 			else:
+				t1 = time.time()
 				pred = forward_backward(trans_prob,b,trans_prob[0,:],sequences[i,:])[1]
+				t2 = time.time()
+
 			start = np.where(np.array(pred)==1)[0]
+			total_time += (t2-t1)
+
 			if start == start_points[i]:
 				correct+=1
 
 
 		accuracy = float(correct)/float(num_sequences)
+		avg_time = total_time/float(num_sequences)
 		print("Accuracy for test %d: %f" % (test,accuracy))
 		print()
-		results[test] = accuracy
+		print("Average runtime for test %d: %f" % (test,avg_time))
+		print()
 
+		results[test] = accuracy
 
 
 	return results
